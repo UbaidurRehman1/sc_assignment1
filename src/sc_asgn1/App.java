@@ -5,7 +5,7 @@ public class App {
 	public static void main(String[] args)
 	{
 		HotelBooking app = new HotelBooking();
-		app.startApplication();
+		app.startApplication();		
 	}
 
 }

@@ -16,6 +16,8 @@ import java.util.GregorianCalendar;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+import sc_asgn1.dateValidator.DateValidation;
+
 /**
  *
  * @author Ubaid ur Rehman
@@ -25,6 +27,8 @@ public class HotelBooking
 
 	private final static String CAPITAL_AlPHABETS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	private final static String ALPHABETS = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	private final static String LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
+	private final static String UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	private Scanner input;
 	
 	public HotelBooking()
@@ -43,7 +47,7 @@ public class HotelBooking
 			input.nextLine();  // Consume newline left-over
 			if(days < 1 || days > 7)
 			{
-				throw new IllegalArgumentException("We do not provider server for more than 7 or less than 1 days");
+				throw new IllegalArgumentException("We do not provide service for more than 7 or less than 1 days");
 			}
 			return days;
 			
@@ -73,14 +77,16 @@ public class HotelBooking
 	{
 		RoomType roomType = null;
 		
-		if(pricePerday < 10000)
+		if(pricePerday < 10000 && pricePerday > 0)
 			roomType = RoomType.Studio;
-		else if(pricePerday >= 10000 || pricePerday <= 25000)
+		else if(pricePerday >= 10000 && pricePerday <= 25000)
 			roomType = RoomType.ExecutiveSuite;
 		else if(pricePerday > 50000)
 			roomType = RoomType.Cabana;
-		else if(pricePerday >= 25001 || pricePerday <= 49999)
+		else if(pricePerday >= 25001 && pricePerday <= 49999)
 			throw new IllegalArgumentException("Price between 25001 to 49999 is not permitted");
+		else if(pricePerday <= 0)
+			throw new IllegalArgumentException("Price should not be smaller than 0");
 
 		return roomType;
 	}
@@ -99,7 +105,41 @@ public class HotelBooking
 	
 	private boolean validateName(String name)
 	{
-		return validateTitleCase(name) && validateAlphabets(name);
+		return validateTitleCase(name) && validateAlphabets(name) && validateLowerCase(name) && validateUpperCase(name);
+	}
+	
+	private boolean validateLowerCase(String name)
+	{
+		String[] name_array = name.split(" ");
+		for(int i = 0; i < name_array.length; i++)
+		{
+			String namePart = name_array[i];
+			if(LOWERCASE.contains(namePart.substring(0, 1)))
+			{
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	private boolean validateUpperCase(String name)
+	{
+		String[] name_array = name.split(" ");
+		for(int i = 0; i < name_array.length; i++)
+		{
+			String namePart = name_array[i];
+			for(int j = 1; j < namePart.length(); j++)
+			{
+				if(UPPERCASE.contains(namePart.substring(j, j+1)))
+				{
+					return false;
+				}
+			}
+		}
+		
+		return true;
+		
 	}
 	
 	private boolean validateTitleCase(String name)
@@ -134,7 +174,7 @@ public class HotelBooking
 	
 	private String getDate()
 	{
-		System.out.println("What is your birthdate(dd/mm/yyyy):\t");
+		System.out.println("What is your birthdate(dd-mm-yyyy):\t");
 		String date = input.nextLine();
 		try
 		{
@@ -152,16 +192,28 @@ public class HotelBooking
 	
 	private boolean validateDate(String _date) throws IllegalArgumentException
 	{	
-        DateFormat formatter = new SimpleDateFormat("dd/mm/yyyy");
+        DateFormat formatter = new SimpleDateFormat("dd-mm-yyyy");
         formatter.setLenient(false);
         try
         {
             Date date= formatter.parse(_date);
-            Calendar calendar = new GregorianCalendar();
-            calendar.setTime(date);
-            int year = calendar.get(Calendar.YEAR);
-            return validateYear(year);
+         
+            String[] dateParts = _date.split("\\-");
             
+            String _day = dateParts[0];
+            String _month = dateParts[1];
+            String _year = dateParts[2];
+            
+            int day = Integer.parseInt(_day);
+            int month = Integer.parseInt(_month);
+            int year = Integer.parseInt(_year);
+            
+            return DateValidation.getInstance().validateDate(day, month, year);
+            
+        }
+        catch(NumberFormatException exp)
+        {
+        	throw new IllegalArgumentException("Date is not in proper format");        	
         }
         catch (ParseException e)
         {
@@ -169,12 +221,6 @@ public class HotelBooking
         }
 	}
 	
-	private boolean validateYear(int year) throws IllegalArgumentException
-	{
-		if(year > 2000)
-			throw new IllegalArgumentException("Age should be greater than 19");
-		return true;
-	}
 	
 	private long getCNIC()
 	{
@@ -307,7 +353,7 @@ public class HotelBooking
     	catch(IllegalArgumentException exp)
     	{
     		System.out.println(exp.getMessage());
-    		System.out.println("Try again with correct format:\n\n");
+    		System.out.println("Try again with correct inputs/format/method:\n\n");
     	}
     }
     
@@ -315,6 +361,7 @@ public class HotelBooking
     {
     	do
     	{
+    		System.out.println("\n\n***********Welcome in Pakistan Hotel***********\n");
     		register();
     	}while(true);
     }
