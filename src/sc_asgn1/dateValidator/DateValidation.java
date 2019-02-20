@@ -103,7 +103,7 @@ public class DateValidation
 	
 	private boolean validateYear(int year) throws IllegalArgumentException
 	{
-		if(year > 1999 && year < 1950)
+		if(year > 1999 || year < 1950)
 			throw new IllegalArgumentException("Year should be in range 1950 to 1999");
 		return true;
 	}

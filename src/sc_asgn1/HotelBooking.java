@@ -196,7 +196,7 @@ public class HotelBooking
         formatter.setLenient(false);
         try
         {
-            Date date= formatter.parse(_date);
+            formatter.parse(_date);
          
             String[] dateParts = _date.split("\\-");
             
@@ -242,6 +242,7 @@ public class HotelBooking
 		}
 		catch(InputMismatchException exp)
 		{
+			input.nextLine();  // Consume newline left-over
 			throw new IllegalArgumentException("Enter only digits");
 		}
 		
@@ -348,7 +349,6 @@ public class HotelBooking
     		int rating = getRating();
     		User user = new User(days, roomType, name, birthdate, cnic, imagePath, rating);
     		System.out.println("\n" + user.toString() + "\n");
-    		
     	}
     	catch(IllegalArgumentException exp)
     	{
